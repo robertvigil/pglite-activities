@@ -26,17 +26,20 @@ A single HTML file loaded in your browser. Activities live in the browser's Inde
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────┐
-│              Your browser                    │
-│  ┌────────────────────────────────────────┐  │
-│  │  index.html (~26KB)                    │  │
-│  │   ├── UI (pure HTML/CSS/JS)            │  │
-│  │   └── PGlite (Postgres WASM, ~3MB)     │  │
-│  │         └── IndexedDB                  │  │
-│  │              └── activities table      │  │
-│  └────────────────────────────────────────┘  │
-└──────────────────────────────────────────────┘
+```mermaid
+graph TD
+    Browser[Your browser]
+    HTML[index.html ~26KB]
+    UI[UI — HTML / CSS / JS]
+    PGlite[PGlite — Postgres WASM ~3MB]
+    IDB[(IndexedDB)]
+    Table[activities table]
+
+    Browser --> HTML
+    HTML --> UI
+    HTML --> PGlite
+    PGlite --> IDB
+    IDB --> Table
 ```
 
 - **No backend.** The server only delivers `index.html` (static file).
