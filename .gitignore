@@ -1,0 +1,19 @@
+# Local-only seed data (may contain personal data from private backups)
+activities.sql
+
+# Local dev Python server — not shipped to production
+serve.py
+
+# Deployment script — contains personal server paths
+deploy.sh
+
+# Generated audio/wav files, temp exports, downloads
+*.wav
+*.csv
+
+# Common
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

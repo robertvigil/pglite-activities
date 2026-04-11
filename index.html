@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activities</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #111; color: #0f0;
+      max-width: 900px; margin: 0 auto; padding: 8px 20px;
+    }
+    h1 { color: #0f0; margin: 0 0 8px; font-size: 1.2em; }
+    p { color: #888; font-size: 0.85em; margin-bottom: 15px; }
+
+    /* Date range controls */
+    .controls {
+      display: flex; gap: 10px; align-items: center;
+      margin-bottom: 15px; flex-wrap: wrap;
+    }
+    .controls label { color: #888; font-size: 0.85em; }
+    .controls input[type="date"] {
+      padding: 6px 8px; font-size: 14px;
+      background: #222; color: #0f0; border: 1px solid #0f0;
+      border-radius: 3px; font-family: inherit;
+    }
+    .controls button {
+      padding: 6px 12px; font-size: 13px;
+      background: #222; color: #0f0; border: 1px solid #555;
+      border-radius: 3px; cursor: pointer; font-family: inherit;
+    }
+    .controls button:hover { border-color: #0f0; }
+    .help-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; padding: 0;
+      background: transparent; color: #666; border: 1px solid #555;
+      border-radius: 3px; cursor: pointer; font-family: inherit;
+      font-size: 14px; font-weight: bold;
+      text-decoration: none;
+    }
+    .help-link:hover { color: #0f0; border-color: #0f0; }
+
+    /* Search bar */
+    .search-bar {
+      margin-bottom: 10px;
+    }
+    .search-bar input {
+      width: 100%; padding: 7px 10px; font-size: 14px;
+      background: #222; color: #0f0; border: 1px solid #0f0;
+      border-radius: 3px; font-family: inherit;
+    }
+    .search-bar input::placeholder { color: #555; }
+
+    /* Results table */
+    table {
+      width: 100%; border-collapse: collapse;
+      background: #1a1a1a; font-size: 0.9em;
+    }
+    th, td {
+      border: 1px solid #333; padding: 5px 10px; text-align: left;
+    }
+    th { background: #222; color: #0f0; }
+    tr:hover { background: #222; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Totals panel */
+    .totals {
+      margin-top: 15px; padding: 10px 8px;
+      background: #1a2a1a; border: 1px solid #0f0;
+      border-radius: 4px; display: flex; gap: 15px;
+      font-size: 0.95em;
+    }
+    .totals .item { display: flex; gap: 4px; }
+    .totals .label { color: #888; }
+    .totals .value { color: #0f0; font-weight: bold; }
+
+    #status { color: #666; font-size: 0.8em; margin-top: 10px; }
+
+    /* Create form */
+    .create-bar {
+      display: flex; gap: 8px; align-items: center;
+      margin-bottom: 10px;
+    }
+    .create-bar button {
+      padding: 2px 8px; font-size: 22px;
+      background: transparent; color: #666; border: none;
+      cursor: pointer; font-family: inherit; line-height: 1;
+    }
+    .create-bar button:hover { color: #0f0; }
+    .create-form {
+      display: none; flex-wrap: wrap; gap: 8px; align-items: center;
+      margin-bottom: 15px; padding: 10px;
+      background: #1a1a1a; border: 1px solid #333; border-radius: 4px;
+    }
+    .create-form.open { display: flex; }
+    .create-form input, .create-form textarea {
+      padding: 6px 8px; font-size: 14px;
+      background: #222; color: #0f0; border: 1px solid #0f0;
+      border-radius: 3px; font-family: inherit;
+    }
+    .create-form input[type="date"] { width: 150px; }
+    .create-form input[type="number"] { width: 90px; }
+    .create-form input#new-duration { width: 100px; }
+
+    /* Hide number input spinners (Chrome/Safari and Firefox) */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .create-form input#new-comments { flex: 1; min-width: 200px; }
+    .create-form .actions { display: flex; gap: 2px; }
+    .create-form button {
+      padding: 2px 8px; font-size: 22px;
+      background: transparent; color: #666; border: none;
+      cursor: pointer; font-family: inherit; line-height: 1;
+    }
+    .create-form button[type="submit"]:hover { color: #0f0; }
+    .create-form button.cancel:hover { color: #f66; }
+
+    /* Row action buttons */
+    td.actions {
+      white-space: nowrap; text-align: right; width: 1px;
+    }
+    td.actions button {
+      padding: 2px 6px; font-size: 18px; margin-left: 2px;
+      background: transparent; color: #666; border: none;
+      cursor: pointer; font-family: inherit; line-height: 1;
+    }
+    td.actions button:hover { color: #0f0; }
+    td.actions button.delete:hover { color: #f66; }
+    td.actions button.save { color: #0f0; font-weight: bold; }
+    td.actions button.cancel:hover { color: #f66; }
+
+    /* Inline edit inputs */
+    tr.editing td input, tr.editing td textarea {
+      width: 100%; padding: 3px 5px; font-size: 0.85em;
+      background: #222; color: #0f0; border: 1px solid #0f0;
+      border-radius: 2px; font-family: inherit;
+    }
+    tr.editing td input[type="date"] { width: auto; }
+
+    /* Mobile: stack each row as a block so comments can wrap below */
+    @media (max-width: 600px) {
+      table, tbody, tr, td { display: block; width: 100%; }
+      /* Hide the header row (which uses plain th cells, no thead wrapper) */
+      table tr:first-child th { display: none; }
+      table tr:has(th) { display: none; }
+      tr {
+        border: 1px solid #333; border-radius: 4px;
+        padding: 6px 8px; margin-bottom: 6px; position: relative;
+      }
+      td { border: none; padding: 1px 0; }
+      td:nth-child(1)::before { content: ''; } /* date: first line */
+      td:nth-child(2) { display: inline-block; width: auto; padding-right: 10px; }
+      td:nth-child(3) { display: inline-block; width: auto; }
+      td:nth-child(4) { color: #888; font-size: 0.9em; display: inline; }
+      td.actions {
+        display: inline; padding-left: 10px;
+      }
+      /* Compact date + distance + duration on one visual line via inline-block */
+      td:nth-child(1) {
+        display: inline-block; width: auto; padding-right: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>[activities]</h1>
+
+  <div class="controls">
+    <input type="date" id="begin-date">
+    <label>→</label>
+    <input type="date" id="end-date">
+    <button id="this-week">Wk</button>
+    <button id="this-month">Mo</button>
+    <button id="this-year">Yr</button>
+    <button id="all-time" title="All time">∞</button>
+    <a href="https://github.com/robertvigil/pglite-activities" target="_blank" rel="noopener" title="Help / docs" class="help-link">?</a>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="search" placeholder='Search comments — "rainy yale" (AND), "-trail" (exclude)' autocomplete="off">
+  </div>
+
+  <div class="create-bar">
+    <button id="create-toggle" title="New activity">✚</button>
+    <button id="export-csv" title="Export CSV">↓</button>
+    <button id="import-csv" title="Import CSV">↑</button>
+    <input type="file" id="csv-input" accept=".csv" style="display:none">
+  </div>
+  <form class="create-form" id="create-form">
+    <input type="date" id="new-date" required>
+    <input type="number" id="new-distance" step="0.01" min="0" placeholder="distance" required>
+    <input type="text" id="new-duration" placeholder="HH:MM:SS" pattern="^[0-9]{2}:[0-5][0-9]:[0-5][0-9]$" required>
+    <input type="text" id="new-comments" placeholder="comments (optional)">
+    <div class="actions">
+      <button type="submit" title="Save">✓</button>
+      <button type="button" class="cancel" id="create-cancel" title="Cancel">↺</button>
+    </div>
+  </form>
+
+  <div id="output">Loading PGlite...</div>
+  <div id="totals" class="totals" style="display:none"></div>
+  <div id="status"></div>
+
+  <script type="module">
+    import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js';
+
+    const db = new PGlite('idb://activities-v4');
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS activities (
+        id SERIAL PRIMARY KEY,
+        date DATE NOT NULL,
+        distance NUMERIC(10, 2) NOT NULL,
+        duration INTERVAL NOT NULL,
+        comments TEXT DEFAULT '',
+        UNIQUE (date, distance, duration, comments)
+      );
+    `);
+
+    // No automatic seeding — new devices/browsers start with an empty database.
+    // Use the Import CSV button (↑) to load data, or the Create button (✚) to add activities manually.
+
+    // --- Date range helpers ---
+    function iso(d) { return d.toISOString().split('T')[0]; }
+
+    function getCurrentWeek() {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      return { begin: iso(monday), end: iso(sunday) };
+    }
+
+    function getCurrentMonth() {
+      const now = new Date();
+      const first = new Date(now.getFullYear(), now.getMonth(), 1);
+      const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      return { begin: iso(first), end: iso(last) };
+    }
+
+    function getCurrentYear() {
+      const now = new Date();
+      return { begin: `${now.getFullYear()}-01-01`, end: `${now.getFullYear()}-12-31` };
+    }
+
+    function getAllTime() {
+      return { begin: '1970-01-01', end: '2099-12-31' };
+    }
+
+    // --- Parse search query into include/exclude terms ---
+    // "rainy yale -trail" → { include: ['rainy', 'yale'], exclude: ['trail'] }
+    function parseSearch(query) {
+      const terms = query.trim().split(/\s+/).filter(Boolean);
+      const include = [];
+      const exclude = [];
+      for (const t of terms) {
+        if (t.startsWith('-') && t.length > 1) {
+          exclude.push(t.substring(1));
+        } else {
+          include.push(t);
+        }
+      }
+      return { include, exclude };
+    }
+
+    // Build SQL WHERE fragments and params for comment search.
+    // Starts at $3 since $1 and $2 are begin/end dates.
+    function buildSearchClauses({ include, exclude }, startIdx = 3) {
+      const clauses = [];
+      const params = [];
+      let i = startIdx;
+      for (const term of include) {
+        clauses.push(`comments ILIKE $${i}`);
+        params.push(`%${term}%`);
+        i++;
+      }
+      for (const term of exclude) {
+        clauses.push(`comments NOT ILIKE $${i}`);
+        params.push(`%${term}%`);
+        i++;
+      }
+      return {
+        where: clauses.length ? ' AND ' + clauses.join(' AND ') : '',
+        params,
+      };
+    }
+
+    // --- Main refresh: filter by date range + search, compute totals ---
+    async function refresh() {
+      const begin = document.getElementById('begin-date').value;
+      const end = document.getElementById('end-date').value;
+      if (!begin || !end) return;
+
+      // Persist range in localStorage
+      localStorage.setItem('activities.begin', begin);
+      localStorage.setItem('activities.end', end);
+
+      // Build search WHERE clause
+      const searchQuery = document.getElementById('search').value;
+      const parsed = parseSearch(searchQuery);
+      const search = buildSearchClauses(parsed);
+
+      // Totals via SQL — count, total distance, total duration formatted as HHH:MM:SS
+      // All math done server-side in PGlite, nothing for JS to compute
+      const totalsResult = await db.query(`
+        WITH agg AS (
+          SELECT
+            COUNT(*) AS n,
+            COALESCE(SUM(distance), 0)::int AS total_distance,
+            COALESCE(EXTRACT(EPOCH FROM SUM(duration))::bigint, 0) AS total_secs
+          FROM activities
+          WHERE date BETWEEN $1 AND $2 ${search.where}
+        )
+        SELECT
+          n,
+          total_distance,
+          (total_secs / 3600)::text || ':' ||
+          LPAD(((total_secs % 3600) / 60)::text, 2, '0') || ':' ||
+          LPAD((total_secs % 60)::text, 2, '0')
+          AS total_duration
+        FROM agg;
+      `, [begin, end, ...search.params]);
+
+      const totals = totalsResult.rows[0];
+      const count = Number(totals.n);
+      const totalDistance = totals.total_distance;
+      const totalDuration = totals.total_duration;
+
+      // Always show totals
+      const totalsDiv = document.getElementById('totals');
+      totalsDiv.style.display = 'flex';
+      totalsDiv.innerHTML = `
+        <div class="item"><span class="label">#:</span><span class="value">${count}</span></div>
+        <div class="item"><span class="label">dis:</span><span class="value">${totalDistance}</span></div>
+        <div class="item"><span class="label">dur:</span><span class="value">${totalDuration}</span></div>
+      `;
+
+      // Only show individual rows if ≤31 activities in range
+      const div = document.getElementById('output');
+      if (count === 0) {
+        div.innerHTML = '<p style="color:#666">No activities in this date range.</p>';
+      } else if (count > 31) {
+        div.innerHTML = `<p style="color:#666">${count} activities in this range — list hidden. Narrow the date range to see individual rows.</p>`;
+      } else {
+        const result = await db.query(`
+          SELECT
+            id,
+            date,
+            distance,
+            to_char(duration, 'HH24:MI:SS') AS duration,
+            comments
+          FROM activities
+          WHERE date BETWEEN $1 AND $2 ${search.where}
+          ORDER BY date DESC, id DESC;
+        `, [begin, end, ...search.params]);
+
+        let html = '<table><tr><th>Date</th><th class="num">Distance</th><th>Duration</th><th>Comments</th><th></th></tr>';
+        const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        for (const row of result.rows) {
+          const dateStr = new Date(row.date).toISOString().split('T')[0];
+          const [y, m, d] = dateStr.split('-').map(Number);
+          const dayName = dayNames[new Date(y, m - 1, d).getDay()];
+          html += `<tr data-id="${row.id}" data-date="${dateStr}" data-distance="${row.distance}" data-duration="${row.duration}" data-comments="${escapeHtml(row.comments || '')}">
+            <td>${dateStr} (${dayName})</td>
+            <td class="num">${row.distance}</td>
+            <td>${row.duration}</td>
+            <td>${escapeHtml(row.comments || '')}</td>
+            <td class="actions">
+              <button class="edit" title="Edit">✎</button>
+              <button class="delete" title="Delete">✕</button>
+            </td>
+          </tr>`;
+        }
+        html += '</table>';
+        div.innerHTML = html;
+      }
+
+    }
+
+    // --- HTML escape helper (prevents injection in row data) ---
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // --- Row edit/delete via event delegation ---
+    document.getElementById('output').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const tr = btn.closest('tr');
+      if (!tr) return;
+      const id = tr.dataset.id;
+
+      if (btn.classList.contains('delete')) {
+        if (!confirm('Delete this activity?')) return;
+        await db.query('DELETE FROM activities WHERE id = $1;', [id]);
+        await refresh();
+        return;
+      }
+
+      if (btn.classList.contains('edit')) {
+        // Only one row in edit mode at a time — refresh first to reset any others
+        const alreadyEditing = document.querySelector('tr.editing');
+        if (alreadyEditing && alreadyEditing !== tr) {
+          await refresh();
+          // Re-find the target row after refresh and continue
+          const newTr = document.querySelector(`tr[data-id="${id}"]`);
+          if (newTr) newTr.querySelector('.edit').click();
+          return;
+        }
+        // Replace row cells with input fields
+        tr.classList.add('editing');
+        tr.innerHTML = `
+          <td><input type="date" class="edit-date" value="${tr.dataset.date}"></td>
+          <td><input type="number" step="0.01" class="edit-distance" value="${tr.dataset.distance}"></td>
+          <td><input type="text" class="edit-duration" value="${tr.dataset.duration}" pattern="^[0-9]{2}:[0-5][0-9]:[0-5][0-9]$"></td>
+          <td><input type="text" class="edit-comments" value="${tr.dataset.comments}"></td>
+          <td class="actions">
+            <button class="save" title="Save">✓</button>
+            <button class="cancel" title="Cancel">↺</button>
+          </td>
+        `;
+        return;
+      }
+
+      if (btn.classList.contains('save')) {
+        const date = tr.querySelector('.edit-date').value;
+        const distance = tr.querySelector('.edit-distance').value;
+        const duration = tr.querySelector('.edit-duration').value;
+        const comments = tr.querySelector('.edit-comments').value;
+
+        // Basic client-side validation for duration
+        if (!/^[0-9]{2}:[0-5][0-9]:[0-5][0-9]$/.test(duration)) {
+          alert('Duration must be in HH:MM:SS format');
+          return;
+        }
+
+        try {
+          await db.query(
+            'UPDATE activities SET date = $1, distance = $2, duration = $3, comments = $4 WHERE id = $5;',
+            [date, distance, duration, comments, id]
+          );
+          await refresh();
+        } catch (err) {
+          alert('Update failed: ' + err.message);
+        }
+        return;
+      }
+
+      if (btn.classList.contains('cancel')) {
+        await refresh();
+        return;
+      }
+    });
+
+    // --- Esc key = cancel current edit/create ---
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+
+      // If create form is open, close it
+      if (document.getElementById('create-form').classList.contains('open')) {
+        hideCreateForm();
+        return;
+      }
+
+      // If a row is being edited, cancel that edit
+      if (document.querySelector('tr.editing')) {
+        refresh();
+        return;
+      }
+    });
+
+    // --- Create form ---
+    const createForm = document.getElementById('create-form');
+    const createToggle = document.getElementById('create-toggle');
+    const createCancel = document.getElementById('create-cancel');
+
+    function showCreateForm() {
+      createForm.classList.add('open');
+      // Default date = today
+      document.getElementById('new-date').value = iso(new Date());
+      document.getElementById('new-date').focus();
+    }
+
+    function hideCreateForm() {
+      createForm.classList.remove('open');
+      createForm.reset();
+    }
+
+    createToggle.addEventListener('click', () => {
+      if (createForm.classList.contains('open')) {
+        hideCreateForm();
+      } else {
+        showCreateForm();
+      }
+    });
+
+    createCancel.addEventListener('click', hideCreateForm);
+
+    // --- CSV export ---
+    document.getElementById('export-csv').addEventListener('click', async () => {
+      const result = await db.query(`
+        SELECT
+          date,
+          distance,
+          to_char(duration, 'HH24:MI:SS') AS duration,
+          comments
+        FROM activities
+        ORDER BY date, id;
+      `);
+
+      if (result.rows.length === 0) {
+        alert('No activities to export.');
+        return;
+      }
+
+      const headers = ['date', 'distance', 'duration', 'comments'];
+      const lines = [headers.join(',')];
+      for (const row of result.rows) {
+        const dateStr = new Date(row.date).toISOString().split('T')[0];
+        const values = [
+          dateStr,
+          row.distance,
+          row.duration,
+          csvEscape(row.comments || ''),
+        ];
+        lines.push(values.join(','));
+      }
+
+      const csv = lines.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `activities-${iso(new Date())}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // CSV escape — wrap in quotes if contains comma, quote, or newline
+    function csvEscape(str) {
+      const s = String(str);
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    // --- CSV import with dedup via UNIQUE constraint ---
+    document.getElementById('import-csv').addEventListener('click', () => {
+      document.getElementById('csv-input').click();
+    });
+    document.getElementById('csv-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+
+      const rows = parseCsv(text);
+      if (rows.length === 0) {
+        alert('No rows found in CSV.');
+        return;
+      }
+
+      // Expect header row with date, distance, duration, comments
+      const headers = rows[0].map(h => h.trim().toLowerCase());
+      const dateIdx = headers.indexOf('date');
+      const distanceIdx = headers.indexOf('distance');
+      const durationIdx = headers.indexOf('duration');
+      const commentsIdx = headers.indexOf('comments');
+
+      if (dateIdx === -1 || distanceIdx === -1 || durationIdx === -1) {
+        alert('CSV must have columns: date, distance, duration, comments');
+        return;
+      }
+
+      // Count rows before import
+      const before = await db.query('SELECT COUNT(*) AS n FROM activities;');
+      const beforeCount = Number(before.rows[0].n);
+
+      const total = rows.length - 1; // minus header
+      const searchInput = document.getElementById('search');
+      const savedSearch = searchInput.value;
+      const savedPlaceholder = searchInput.placeholder;
+      searchInput.disabled = true;
+      searchInput.value = '';
+
+      // Insert rows in a transaction with ON CONFLICT DO NOTHING for dedup
+      await db.exec('BEGIN;');
+      try {
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row[dateIdx]) continue;
+          await db.query(
+            `INSERT INTO activities (date, distance, duration, comments)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT DO NOTHING;`,
+            [
+              row[dateIdx],
+              row[distanceIdx],
+              row[durationIdx],
+              commentsIdx >= 0 ? (row[commentsIdx] || '') : '',
+            ]
+          );
+
+          // Update progress every 25 rows and yield to the UI thread
+          if (i % 25 === 0 || i === rows.length - 1) {
+            searchInput.placeholder = `Importing ${i} / ${total}...`;
+            await new Promise(r => setTimeout(r, 0));
+          }
+        }
+        await db.exec('COMMIT;');
+      } catch (err) {
+        await db.exec('ROLLBACK;');
+        searchInput.disabled = false;
+        searchInput.value = savedSearch;
+        searchInput.placeholder = savedPlaceholder;
+        alert('Import failed: ' + err.message);
+        return;
+      }
+
+      // Restore search input
+      searchInput.disabled = false;
+      searchInput.value = savedSearch;
+      searchInput.placeholder = savedPlaceholder;
+
+      const after = await db.query('SELECT COUNT(*) AS n FROM activities;');
+      const afterCount = Number(after.rows[0].n);
+      const attempted = rows.length - 1; // minus header
+      const imported = afterCount - beforeCount;
+      const skipped = attempted - imported;
+
+      alert(`Import complete.\n\nAttempted: ${attempted}\nImported: ${imported}\nSkipped (duplicates): ${skipped}`);
+      await refresh();
+    });
+
+    // CSV parser — handles quoted fields, escaped quotes, commas, newlines
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let field = '';
+      let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQuotes) {
+          if (c === '"') {
+            if (text[i + 1] === '"') {
+              field += '"';
+              i++;
+            } else {
+              inQuotes = false;
+            }
+          } else {
+            field += c;
+          }
+        } else {
+          if (c === '"') {
+            inQuotes = true;
+          } else if (c === ',') {
+            row.push(field);
+            field = '';
+          } else if (c === '\n') {
+            row.push(field);
+            rows.push(row);
+            row = [];
+            field = '';
+          } else if (c === '\r') {
+            // skip
+          } else {
+            field += c;
+          }
+        }
+      }
+      // Last field/row
+      if (field || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+      return rows.filter(r => r.length > 0 && r.some(f => f !== ''));
+    }
+
+    createForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const date = document.getElementById('new-date').value;
+      const distance = document.getElementById('new-distance').value;
+      const duration = document.getElementById('new-duration').value;
+      const comments = document.getElementById('new-comments').value;
+
+      try {
+        await db.query(
+          'INSERT INTO activities (date, distance, duration, comments) VALUES ($1, $2, $3, $4);',
+          [date, distance, duration, comments]
+        );
+        hideCreateForm();
+        await refresh();
+      } catch (err) {
+        alert('Failed to create activity: ' + err.message);
+      }
+    });
+
+    // --- Wire up controls ---
+    document.getElementById('begin-date').addEventListener('change', refresh);
+    document.getElementById('end-date').addEventListener('change', refresh);
+    document.getElementById('search').addEventListener('input', refresh);
+
+    function setRange({ begin, end }) {
+      document.getElementById('begin-date').value = begin;
+      document.getElementById('end-date').value = end;
+      refresh();
+    }
+
+    document.getElementById('this-week').addEventListener('click', () => setRange(getCurrentWeek()));
+    document.getElementById('this-month').addEventListener('click', () => setRange(getCurrentMonth()));
+    document.getElementById('this-year').addEventListener('click', () => setRange(getCurrentYear()));
+    document.getElementById('all-time').addEventListener('click', () => setRange(getAllTime()));
+
+    // --- Init: restore saved range or default to this week ---
+    const savedBegin = localStorage.getItem('activities.begin');
+    const savedEnd = localStorage.getItem('activities.end');
+    if (savedBegin && savedEnd) {
+      setRange({ begin: savedBegin, end: savedEnd });
+    } else {
+      setRange(getCurrentWeek());
+    }
+  </script>
+</body>
+</html>
