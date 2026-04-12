@@ -342,7 +342,7 @@
       const div = document.getElementById('output');
       if (count === 0) {
         div.innerHTML = '<p style="color:#666">No activities in this date range.</p>';
-      } else if (count > 30) {
+      } else if (count > 40) {
         div.innerHTML = `<p style="color:#666">${count} activities in this range — list hidden. Narrow the date/search range to see individual rows.</p>`;
       } else {
         const result = await db.query(`
