@@ -17,7 +17,7 @@ A single HTML file loaded in your browser. Activities live in the browser's Inde
 - **Date range filtering** — always-active `from → to` range with quick buttons (Wk / Mo / Yr / ∞). Range persists in localStorage.
 - **Live totals** — count, total distance, total duration — computed by the database, not JavaScript
 - **Comments search** — multi-word AND with exclusion: `yale -rain` matches comments containing "yale" but not "rain"
-- **Smart list/summary display** — ≤31 rows shows individual activities, >31 rows shows totals only (prevents wall-of-text for wide date ranges)
+- **Smart list/summary display** — ≤30 rows shows individual activities, >30 rows shows totals only (prevents wall-of-text for wide date ranges)
 - **Inline CRUD** — add, edit, delete activities with compact icon buttons (✚ ✎ ✕ ✓ ↺)
 - **CSV import/export** — round-trip activities to a CSV file. Import has built-in deduplication via a unique constraint on `(date, distance, duration, comments)`, so re-importing the same CSV is a no-op
 - **Keyboard-friendly** — Esc cancels create/edit, Enter submits forms

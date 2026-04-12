@@ -25,21 +25,16 @@
       background: #222; color: #0f0; border: 1px solid #0f0;
       border-radius: 3px; font-family: inherit;
     }
-    .controls button {
-      padding: 6px 12px; font-size: 13px;
+    .controls button,
+    .controls .help-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 36px; height: 30px; padding: 0 8px;
       background: #222; color: #0f0; border: 1px solid #555;
       border-radius: 3px; cursor: pointer; font-family: inherit;
+      font-size: 13px; text-decoration: none;
     }
-    .controls button:hover { border-color: #0f0; }
-    .help-link {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px; padding: 0;
-      background: transparent; color: #666; border: 1px solid #555;
-      border-radius: 3px; cursor: pointer; font-family: inherit;
-      font-size: 14px; font-weight: bold;
-      text-decoration: none;
-    }
-    .help-link:hover { color: #0f0; border-color: #0f0; }
+    .controls button:hover,
+    .controls .help-link:hover { border-color: #0f0; }
 
     /* Search bar */
     .search-bar {
@@ -347,8 +342,8 @@
       const div = document.getElementById('output');
       if (count === 0) {
         div.innerHTML = '<p style="color:#666">No activities in this date range.</p>';
-      } else if (count > 31) {
-        div.innerHTML = `<p style="color:#666">${count} activities in this range — list hidden. Narrow the date range to see individual rows.</p>`;
+      } else if (count > 30) {
+        div.innerHTML = `<p style="color:#666">${count} activities in this range — list hidden. Narrow the date/search range to see individual rows.</p>`;
       } else {
         const result = await db.query(`
           SELECT
@@ -363,13 +358,15 @@
         `, [begin, end, ...search.params]);
 
         let html = '<table><tr><th>Date</th><th class="num">Distance</th><th>Duration</th><th>Comments</th><th></th></tr>';
-        const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        const dayNames = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'];
         for (const row of result.rows) {
           const dateStr = new Date(row.date).toISOString().split('T')[0];
           const [y, m, d] = dateStr.split('-').map(Number);
           const dayName = dayNames[new Date(y, m - 1, d).getDay()];
+          // Display as m/d/yy (more compact than yyyy-mm-dd)
+          const displayDate = `${m}/${d}/${String(y).slice(-2)}`;
           html += `<tr data-id="${row.id}" data-date="${dateStr}" data-distance="${row.distance}" data-duration="${row.duration}" data-comments="${escapeHtml(row.comments || '')}">
-            <td>${dateStr} (${dayName})</td>
+            <td>${displayDate} (${dayName})</td>
             <td class="num">${row.distance}</td>
             <td>${row.duration}</td>
             <td>${escapeHtml(row.comments || '')}</td>
