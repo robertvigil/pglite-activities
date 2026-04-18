@@ -1,0 +1,158 @@
+* { box-sizing: border-box; }
+:root { --accent: #0f0; --accent-dim: #1a2a1a; }
+:root[data-theme="green"] { --accent: #0f0; --accent-dim: #1a2a1a; }
+:root[data-theme="amber"] { --accent: #ffb000; --accent-dim: #2a2210; }
+:root[data-theme="white"] { --accent: #e0e0e0; --accent-dim: #1a1a1a; }
+body {
+  font-family: 'Courier New', monospace;
+  background: #111; color: var(--accent);
+  max-width: 900px; margin: 0 auto; padding: 8px 20px;
+}
+h1 { color: var(--accent); margin: 0 0 8px; font-size: 1.2em; }
+p { color: #888; font-size: 0.85em; margin-bottom: 15px; }
+
+/* Date range controls */
+.controls {
+  display: flex; gap: 10px; align-items: center;
+  margin-bottom: 15px; flex-wrap: wrap;
+}
+.controls label { color: #888; font-size: 0.85em; }
+.controls input[type="date"] {
+  padding: 6px 8px; font-size: 14px;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 3px; font-family: inherit;
+}
+.controls button,
+.controls .help-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 30px; padding: 0 8px;
+  background: #222; color: var(--accent); border: 1px solid #555;
+  border-radius: 3px; cursor: pointer; font-family: inherit;
+  font-size: 13px; text-decoration: none;
+}
+.controls button:hover,
+.controls .help-link:hover { border-color: var(--accent); }
+
+/* Search bar */
+.search-bar { margin-bottom: 10px; }
+.search-bar input {
+  width: 100%; padding: 7px 10px; font-size: 14px;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 3px; font-family: inherit;
+}
+.search-bar input::placeholder { color: #555; }
+
+/* Results table */
+table {
+  width: 100%; border-collapse: collapse;
+  background: #1a1a1a; font-size: 0.9em;
+}
+th, td {
+  border: 1px solid #333; padding: 5px 10px; text-align: left;
+}
+th { background: #222; color: var(--accent); }
+tr:hover { background: #222; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Totals panel */
+.totals {
+  margin-top: 15px; padding: 10px 8px;
+  background: var(--accent-dim); border: 1px solid var(--accent);
+  border-radius: 4px; display: flex; gap: 15px;
+  font-size: 0.95em;
+}
+.totals .item { display: flex; gap: 4px; }
+.totals .label { color: #888; }
+.totals .value { color: var(--accent); font-weight: bold; }
+
+#status { color: #666; font-size: 0.8em; margin-top: 10px; }
+
+/* Create form */
+.create-bar {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 10px;
+}
+.create-bar button {
+  padding: 2px 8px; font-size: 22px;
+  background: transparent; color: #666; border: none;
+  cursor: pointer; font-family: inherit; line-height: 1;
+}
+.create-bar button:hover { color: var(--accent); }
+.create-form {
+  display: none; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 15px; padding: 10px;
+  background: #1a1a1a; border: 1px solid #333; border-radius: 4px;
+}
+.create-form.open { display: flex; }
+.create-form input, .create-form textarea {
+  padding: 6px 8px; font-size: 14px;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 3px; font-family: inherit;
+}
+.create-form input[type="date"] { width: 150px; }
+.create-form input[type="number"] { width: 90px; }
+.create-form input#new-duration { width: 100px; }
+
+/* Hide number input spinners (Chrome/Safari and Firefox) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+   -webkit-appearance: none; margin: 0;
+}
+input[type="number"] {
+   -moz-appearance: textfield;
+}
+.create-form input#new-comments { flex: 1; min-width: 200px; }
+.create-form .actions { display: flex; gap: 2px; }
+.create-form button {
+  padding: 2px 8px; font-size: 22px;
+  background: transparent; color: #666; border: none;
+  cursor: pointer; font-family: inherit; line-height: 1;
+}
+.create-form button[type="submit"]:hover { color: var(--accent); }
+.create-form button.cancel:hover { color: #f66; }
+
+/* Row action buttons */
+td.actions {
+  white-space: nowrap; text-align: right; width: 1px;
+}
+td.actions button {
+  padding: 2px 6px; font-size: 18px; margin-left: 2px;
+  background: transparent; color: #666; border: none;
+  cursor: pointer; font-family: inherit; line-height: 1;
+}
+td.actions button:hover { color: var(--accent); }
+td.actions button.delete:hover { color: #f66; }
+td.actions button.save { color: var(--accent); font-weight: bold; }
+td.actions button.cancel:hover { color: #f66; }
+
+/* Inline edit inputs */
+tr.editing td input, tr.editing td textarea {
+  width: 100%; padding: 3px 5px; font-size: 0.85em;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 2px; font-family: inherit;
+}
+tr.editing td input[type="date"] { width: auto; }
+
+/* Mobile: stack each row as a block so comments can wrap below */
+@media (max-width: 600px) {
+  table, tbody, tr, td { display: block; width: 100%; }
+   /* Hide the header row (which uses plain th cells, no thead wrapper) */
+  table tr:first-child th { display: none; }
+  table tr:has(th) { display: none; }
+  tr {
+    border: 1px solid #333; border-radius: 4px;
+    padding: 6px 8px; margin-bottom: 6px; position: relative;
+   }
+  td { border: none; padding: 1px 0; }
+  td:nth-child(1)::before { content: ''; } /* date: first line */
+  td:nth-child(2) { display: inline-block; width: auto; padding-right: 10px; }
+  td:nth-child(3) { display: inline-block; width: auto; }
+  td:nth-child(4) { color: #888; font-size: 0.9em; display: inline; }
+  td.actions {
+    display: inline; padding-left: 10px;
+   }
+   /* Compact date + distance + duration on one visual line via inline-block */
+  td:nth-child(1) {
+    display: inline-block; width: auto; padding-right: 10px;
+   }
+}

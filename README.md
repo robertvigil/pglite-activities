@@ -10,11 +10,11 @@ Built for logging distance-based exercises (biking, running, walking) but the sc
 
 ## How it works
 
-A single HTML file loaded in your browser. Activities live in the browser's IndexedDB via PGlite. To move data between devices, export a JSON file and share it however you want (I use [Syncthing](https://syncthing.net/)).
+A single HTML file with separate CSS and JS modules loaded as ES modules. Activities live in the browser's IndexedDB via PGlite. To move data between devices, export a JSON file and share it however you want (I use [Syncthing](https://syncthing.net/)).
 
 ## Features
 
-- **Date range filtering** — always-active `from → to` range with quick buttons (Wk / Mo / Yr / ∞). Range persists in localStorage. ◀ ▶ arrows appear when the range is a full Monday–Sunday week, stepping back/forward one week.
+- **Date range filtering** — always-active `from → to` range with quick buttons (Wk / Mo / Yr / ∞). ◀ ▶ arrows appear for full weeks and full months, stepping back/forward accordingly. Range persists in localStorage.
 - **Live totals** — count, total distance, total duration — computed by the database, not JavaScript
 - **Comments search** — multi-word AND with exclusion: `yale -rain` matches comments containing "yale" but not "rain"
 - **Smart list/summary display** — ≤40 rows shows individual activities, >40 rows shows totals only (prevents wall-of-text for wide date ranges)
@@ -27,6 +27,30 @@ A single HTML file loaded in your browser. Activities live in the browser's Inde
 - **Retro terminal aesthetic** — green-on-black by default, with amber and white alternatives
 
 ## Architecture
+
+```mermaid
+graph TD
+    Browser[Your browser]
+    HTML[index.html — 2KB]
+    CSS[css/style.css — 6KB]
+    JS[js/app.js — 21KB]
+    UI[UI — HTML / CSS / JS]
+    PGlite[PGlite — Postgres WASM ~3MB]
+    IDB[(IndexedDB)]
+    Table[activities table]
+
+    Browser --> HTML
+    HTML --> CSS
+    HTML --> JS
+    JS --> UI
+    JS --> PGlite
+    PGlite --> IDB
+    IDB --> Table
+```
+
+- **No backend.** The server delivers static files only.
+- **No network.** Once loaded, the app works offline. Everything happens client-side.
+- **Real SQL.** PGlite is actual PostgreSQL compiled to WebAssembly (see technical docs in `CLAUDE.md`).
 
 ```mermaid
 graph TD
