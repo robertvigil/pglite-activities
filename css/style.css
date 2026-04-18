@@ -135,6 +135,7 @@ tr.editing td input[type="date"] { width: auto; }
 
 /* Mobile: stack each row as a block so comments can wrap below */
 @media (max-width: 600px) {
+  body { padding-bottom: 30px; }
   table, tbody, tr, td { display: block; width: 100%; }
    /* Hide the header row (which uses plain th cells, no thead wrapper) */
   table tr:first-child th { display: none; }
