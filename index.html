@@ -169,8 +169,10 @@
   <div class="controls">
     <input type="date" id="begin-date">
     <label>→</label>
-    <input type="date" id="end-date">
-    <button id="this-week">Wk</button>
+      <input type="date" id="end-date">
+      <button class="week-nav" id="prev-week" title="Previous week">◀</button>
+       <button class="week-nav" id="next-week" title="Next week">▶</button>
+      <button id="this-week">Wk</button>
     <button id="this-month">Mo</button>
     <button id="this-year">Yr</button>
     <button id="all-time" title="All time">∞</button>
@@ -225,14 +227,13 @@
     function iso(d) { return d.toISOString().split('T')[0]; }
 
     function getCurrentWeek() {
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      return { begin: iso(monday), end: iso(sunday) };
-    }
+      const today = new Date();
+      var d = today.getFullYear(), m = today.getMonth(), t = today.getDate();
+      var dow = new Date(d, m, t).getDay() - 1; // 0=Mon..6=Sun
+      var mon = new Date(d, m, t - (dow < 0 ? dow + 7 : dow));
+      var sun = new Date(d, m, t - (dow < 0 ? dow + 7 : dow) + 6);
+      return { begin: iso(mon), end: iso(sun) };
+        }
 
     function getCurrentMonth() {
       const now = new Date();
@@ -247,8 +248,21 @@
     }
 
     function getAllTime() {
-      return { begin: '1970-01-01', end: '2099-12-31' };
-    }
+       return { begin: '1970-01-01', end: '2099-12-31' };
+      }
+
+    function isFullWeek(begin, end) {
+       if (!begin || !end) return false;
+        const b = new Date(begin + 'T00:00:00');
+        const e = new Date(end + 'T00:00:00');
+         // begin must be Monday (dayOfWeek=1), end must be exactly 6 days later (Sunday)
+        return b.getUTCDay() === 1 && e.getTime() === b.getTime() + 6 * 86400000;
+      }
+
+    function showWeekNav(show) {
+       document.getElementById('prev-week').style.display = show ? '' : 'none';
+         document.getElementById('next-week').style.display = show ? '' : 'none';
+      }
 
     // --- Parse search query into include/exclude terms ---
     // "rainy yale -trail" → { include: ['rainy', 'yale'], exclude: ['trail'] }
@@ -707,17 +721,40 @@
     });
 
     // --- Wire up controls ---
-    document.getElementById('begin-date').addEventListener('change', refresh);
-    document.getElementById('end-date').addEventListener('change', refresh);
+     document.getElementById('begin-date').addEventListener('change', (e) => {
+       refresh();
+        showWeekNav(isFullWeek(e.target.value, document.getElementById('end-date').value));
+       });
+       document.getElementById('end-date').addEventListener('change', (e) => {
+        refresh();
+        showWeekNav(isFullWeek(document.getElementById('begin-date').value, e.target.value));
+        });
     document.getElementById('search').addEventListener('input', refresh);
 
     function setRange({ begin, end }) {
-      document.getElementById('begin-date').value = begin;
-      document.getElementById('end-date').value = end;
-      refresh();
-    }
+       document.getElementById('begin-date').value = begin;
+        document.getElementById('end-date').value = end;
+       refresh();
+        showWeekNav(isFullWeek(begin, end));
+       }
 
-    document.getElementById('this-week').addEventListener('click', () => setRange(getCurrentWeek()));
+    document.getElementById('prev-week').addEventListener('click', () => {
+        const b = new Date(document.getElementById('begin-date').value + 'T00:00:00');
+         const e = new Date(document.getElementById('end-date').value + 'T00:00:00');
+         b.setDate(b.getDate() - 7);
+         e.setDate(e.getDate() - 7);
+        setRange({ begin: iso(b), end: iso(e) });
+       });
+
+       document.getElementById('next-week').addEventListener('click', () => {
+        const b = new Date(document.getElementById('begin-date').value + 'T00:00:00');
+         const e = new Date(document.getElementById('end-date').value + 'T00:00:00');
+         b.setDate(b.getDate() + 7);
+         e.setDate(e.getDate() + 7);
+        setRange({ begin: iso(b), end: iso(e) });
+       });
+
+       document.getElementById('this-week').addEventListener('click', () => setRange(getCurrentWeek()));
     document.getElementById('this-month').addEventListener('click', () => setRange(getCurrentMonth()));
     document.getElementById('this-year').addEventListener('click', () => setRange(getCurrentYear()));
     document.getElementById('all-time').addEventListener('click', () => setRange(getAllTime()));

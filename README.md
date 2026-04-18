@@ -14,7 +14,7 @@ A single HTML file loaded in your browser. Activities live in the browser's Inde
 
 ## Features
 
-- **Date range filtering** — always-active `from → to` range with quick buttons (Wk / Mo / Yr / ∞). Range persists in localStorage.
+- **Date range filtering** — always-active `from → to` range with quick buttons (Wk / Mo / Yr / ∞). Range persists in localStorage. ◀ ▶ arrows appear when the range is a full Monday–Sunday week, stepping back/forward one week.
 - **Live totals** — count, total distance, total duration — computed by the database, not JavaScript
 - **Comments search** — multi-word AND with exclusion: `yale -rain` matches comments containing "yale" but not "rain"
 - **Smart list/summary display** — ≤40 rows shows individual activities, >40 rows shows totals only (prevents wall-of-text for wide date ranges)
