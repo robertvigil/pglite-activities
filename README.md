@@ -10,7 +10,7 @@ Built for logging distance-based exercises (biking, running, walking) but the sc
 
 ## How it works
 
-A single HTML file loaded in your browser. Activities live in the browser's IndexedDB via PGlite. To move data between devices, export a CSV and share it however you want (I use [Syncthing](https://syncthing.net/)).
+A single HTML file loaded in your browser. Activities live in the browser's IndexedDB via PGlite. To move data between devices, export a JSON file and share it however you want (I use [Syncthing](https://syncthing.net/)).
 
 ## Features
 
@@ -19,10 +19,12 @@ A single HTML file loaded in your browser. Activities live in the browser's Inde
 - **Comments search** — multi-word AND with exclusion: `yale -rain` matches comments containing "yale" but not "rain"
 - **Smart list/summary display** — ≤40 rows shows individual activities, >40 rows shows totals only (prevents wall-of-text for wide date ranges)
 - **Inline CRUD** — add, edit, delete activities with compact icon buttons (✚ ✎ ✕ ✓ ↺)
-- **CSV import/export** — round-trip activities to a CSV file. Import has built-in deduplication via a unique constraint on `(date, distance, duration, comments)`, so re-importing the same CSV is a no-op
+- **JSON import/export** — round-trip activities to a JSON file. Import replaces all data (with confirmation). Settings (title, theme) are included in exports.
+- **Configurable title** — type `!title My Rides` in the search bar to customize the `[activities]` header. Included in JSON exports.
+- **Theme support** — type `!theme amber`, `!theme white`, or `!theme green` in the search bar to switch the accent color. Persists across sessions and is included in JSON exports.
 - **Keyboard-friendly** — Esc cancels create/edit, Enter submits forms
 - **Mobile responsive** — compact cards on small screens, tables on desktop
-- **Retro terminal aesthetic** — green-on-black monochrome theme
+- **Retro terminal aesthetic** — green-on-black by default, with amber and white alternatives
 
 ## Architecture
 
@@ -81,27 +83,26 @@ It's one HTML file. Drop it behind any web server — nginx, Caddy, Vercel, GitH
 
 ## Import / Export
 
-**Export CSV** (↓ button): downloads `activities-YYYY-MM-DD.csv` with all rows in a standard CSV format (date, distance, duration, comments).
+**Export JSON** (↓ button): downloads `activities-YYYY-MM-DD.json` with all rows and settings. Format:
 
-**Import CSV** (↑ button): reads a CSV file and inserts rows in a transaction. Duplicate rows (same date + distance + duration + comments) are silently skipped thanks to the `UNIQUE` constraint. After import you get a summary:
-
+```json
+{
+  "config": {"site_title": "my rides", "theme": "amber"},
+  "entries": [
+    {"date": "2026-04-18", "distance": 12.5, "duration": "01:15:00", "comments": "windy"}
+  ]
+}
 ```
-Attempted: 893
-Imported: 238
-Skipped (duplicates): 655
-```
 
-This makes the import workflow idempotent — you can re-import the same CSV as often as you want without creating duplicates.
+**Import JSON** (↑ button): replaces all existing data with the contents of a JSON file (with confirmation prompt). Settings (title, theme) are applied from the JSON config.
 
 ## Syncing between devices
 
 There's no built-in sync. The recommended workflow is:
 
-1. Export CSV on device A
-2. Move the CSV file to device B (Syncthing, email, USB, whatever)
-3. Import CSV on device B
-
-The deduplication means you can import "everything" every time without worrying about creating dups. Set up a Syncthing folder between your devices, drop your exports there, and import on whichever device needs updating.
+1. Export JSON on device A
+2. Move the JSON file to device B (Syncthing, email, USB, whatever)
+3. Import JSON on device B
 
 For automatic sync between a browser-based PGlite database and a real Postgres server, look into [ElectricSQL](https://electric-sql.com/) — same team that makes PGlite.
 
@@ -111,9 +112,9 @@ For automatic sync between a browser-based PGlite database and a real Postgres s
 - Nothing is sent to any server
 - Other visitors to the same URL get their own empty database — they can't see your rides
 - If you deploy the site publicly, strangers who visit just get a blank app in their own browser
-- The only thing that leaves your browser is what you choose to export via CSV
+- The only thing that leaves your browser is what you choose to export via JSON
 
-**Backup is your responsibility.** If you clear site data, lose your browser profile, or uninstall the browser without a recent CSV export, your rides are gone. Regular exports to an external location (Syncthing, Dropbox, etc.) are the backup strategy.
+**Backup is your responsibility.** If you clear site data, lose your browser profile, or uninstall the browser without a recent JSON export, your rides are gone. Regular exports to an external location (Syncthing, Dropbox, etc.) are the backup strategy.
 
 ## Keyboard shortcuts
 

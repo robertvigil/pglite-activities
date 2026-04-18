@@ -6,12 +6,16 @@
   <title>Activities</title>
   <style>
     * { box-sizing: border-box; }
+    :root { --accent: #0f0; --accent-dim: #1a2a1a; }
+    :root[data-theme="green"] { --accent: #0f0; --accent-dim: #1a2a1a; }
+    :root[data-theme="amber"] { --accent: #ffb000; --accent-dim: #2a2210; }
+    :root[data-theme="white"] { --accent: #e0e0e0; --accent-dim: #1a1a1a; }
     body {
       font-family: 'Courier New', monospace;
-      background: #111; color: #0f0;
+      background: #111; color: var(--accent);
       max-width: 900px; margin: 0 auto; padding: 8px 20px;
     }
-    h1 { color: #0f0; margin: 0 0 8px; font-size: 1.2em; }
+    h1 { color: var(--accent); margin: 0 0 8px; font-size: 1.2em; }
     p { color: #888; font-size: 0.85em; margin-bottom: 15px; }
 
     /* Date range controls */
@@ -22,19 +26,19 @@
     .controls label { color: #888; font-size: 0.85em; }
     .controls input[type="date"] {
       padding: 6px 8px; font-size: 14px;
-      background: #222; color: #0f0; border: 1px solid #0f0;
+      background: #222; color: var(--accent); border: 1px solid var(--accent);
       border-radius: 3px; font-family: inherit;
     }
     .controls button,
     .controls .help-link {
       display: inline-flex; align-items: center; justify-content: center;
       min-width: 36px; height: 30px; padding: 0 8px;
-      background: #222; color: #0f0; border: 1px solid #555;
+      background: #222; color: var(--accent); border: 1px solid #555;
       border-radius: 3px; cursor: pointer; font-family: inherit;
       font-size: 13px; text-decoration: none;
     }
     .controls button:hover,
-    .controls .help-link:hover { border-color: #0f0; }
+    .controls .help-link:hover { border-color: var(--accent); }
 
     /* Search bar */
     .search-bar {
@@ -42,7 +46,7 @@
     }
     .search-bar input {
       width: 100%; padding: 7px 10px; font-size: 14px;
-      background: #222; color: #0f0; border: 1px solid #0f0;
+      background: #222; color: var(--accent); border: 1px solid var(--accent);
       border-radius: 3px; font-family: inherit;
     }
     .search-bar input::placeholder { color: #555; }
@@ -55,20 +59,20 @@
     th, td {
       border: 1px solid #333; padding: 5px 10px; text-align: left;
     }
-    th { background: #222; color: #0f0; }
+    th { background: #222; color: var(--accent); }
     tr:hover { background: #222; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }
 
     /* Totals panel */
     .totals {
       margin-top: 15px; padding: 10px 8px;
-      background: #1a2a1a; border: 1px solid #0f0;
+      background: var(--accent-dim); border: 1px solid var(--accent);
       border-radius: 4px; display: flex; gap: 15px;
       font-size: 0.95em;
     }
     .totals .item { display: flex; gap: 4px; }
     .totals .label { color: #888; }
-    .totals .value { color: #0f0; font-weight: bold; }
+    .totals .value { color: var(--accent); font-weight: bold; }
 
     #status { color: #666; font-size: 0.8em; margin-top: 10px; }
 
@@ -82,7 +86,7 @@
       background: transparent; color: #666; border: none;
       cursor: pointer; font-family: inherit; line-height: 1;
     }
-    .create-bar button:hover { color: #0f0; }
+    .create-bar button:hover { color: var(--accent); }
     .create-form {
       display: none; flex-wrap: wrap; gap: 8px; align-items: center;
       margin-bottom: 15px; padding: 10px;
@@ -91,7 +95,7 @@
     .create-form.open { display: flex; }
     .create-form input, .create-form textarea {
       padding: 6px 8px; font-size: 14px;
-      background: #222; color: #0f0; border: 1px solid #0f0;
+      background: #222; color: var(--accent); border: 1px solid var(--accent);
       border-radius: 3px; font-family: inherit;
     }
     .create-form input[type="date"] { width: 150px; }
@@ -113,7 +117,7 @@
       background: transparent; color: #666; border: none;
       cursor: pointer; font-family: inherit; line-height: 1;
     }
-    .create-form button[type="submit"]:hover { color: #0f0; }
+    .create-form button[type="submit"]:hover { color: var(--accent); }
     .create-form button.cancel:hover { color: #f66; }
 
     /* Row action buttons */
@@ -125,15 +129,15 @@
       background: transparent; color: #666; border: none;
       cursor: pointer; font-family: inherit; line-height: 1;
     }
-    td.actions button:hover { color: #0f0; }
+    td.actions button:hover { color: var(--accent); }
     td.actions button.delete:hover { color: #f66; }
-    td.actions button.save { color: #0f0; font-weight: bold; }
+    td.actions button.save { color: var(--accent); font-weight: bold; }
     td.actions button.cancel:hover { color: #f66; }
 
     /* Inline edit inputs */
     tr.editing td input, tr.editing td textarea {
       width: 100%; padding: 3px 5px; font-size: 0.85em;
-      background: #222; color: #0f0; border: 1px solid #0f0;
+      background: #222; color: var(--accent); border: 1px solid var(--accent);
       border-radius: 2px; font-family: inherit;
     }
     tr.editing td input[type="date"] { width: auto; }
@@ -164,7 +168,7 @@
   </style>
 </head>
 <body>
-  <h1>[activities]</h1>
+  <h1 id="home-link" style="cursor:pointer">[activities]</h1>
 
   <div class="controls">
     <input type="date" id="begin-date">
@@ -185,9 +189,9 @@
 
   <div class="create-bar">
     <button id="create-toggle" title="New activity">✚</button>
-    <button id="export-csv" title="Export CSV">↓</button>
-    <button id="import-csv" title="Import CSV">↑</button>
-    <input type="file" id="csv-input" accept=".csv" style="display:none">
+    <button id="export-csv" title="Export JSON">↓</button>
+    <button id="import-csv" title="Import JSON">↑</button>
+    <input type="file" id="csv-input" accept=".json" style="display:none">
   </div>
   <form class="create-form" id="create-form">
     <input type="date" id="new-date" required>
@@ -218,10 +222,70 @@
         comments TEXT DEFAULT '',
         UNIQUE (date, distance, duration, comments)
       );
+      CREATE TABLE IF NOT EXISTS config (
+        key TEXT PRIMARY KEY,
+        value TEXT
+      );
     `);
 
+    // --- Theme from config ---
+    const VALID_THEMES = ['green', 'amber', 'white'];
+    async function loadTheme() {
+      const result = await db.query("SELECT value FROM config WHERE key = 'theme'");
+      const theme = result.rows[0]?.value || 'green';
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    // --- Site title from config ---
+    async function loadTitle() {
+      const result = await db.query("SELECT value FROM config WHERE key = 'site_title'");
+      const title = result.rows[0]?.value || 'activities';
+      document.getElementById('home-link').textContent = `[${title}]`;
+    }
+
+    // --- Search bar commands (! prefix) ---
+    async function handleCommand(input) {
+      const raw = input.trim();
+      if (!raw.startsWith('!')) return false;
+
+      const parts = raw.substring(1).split(/\s+/);
+      const cmd = parts[0]?.toLowerCase();
+
+      if (cmd === 'title') {
+        const newTitle = parts.slice(1).join(' ');
+        if (newTitle) {
+          await db.query(
+            "INSERT INTO config (key, value) VALUES ('site_title', $1) ON CONFLICT (key) DO UPDATE SET value = $1;",
+            [newTitle]
+          );
+        } else {
+          await db.query("DELETE FROM config WHERE key = 'site_title';");
+        }
+        await loadTitle();
+        document.getElementById('search').value = '';
+        return true;
+      }
+
+      if (cmd === 'theme') {
+        const theme = parts[1]?.toLowerCase();
+        if (theme && VALID_THEMES.includes(theme)) {
+          await db.query(
+            "INSERT INTO config (key, value) VALUES ('theme', $1) ON CONFLICT (key) DO UPDATE SET value = $1;",
+            [theme]
+          );
+        } else {
+          await db.query("DELETE FROM config WHERE key = 'theme';");
+        }
+        await loadTheme();
+        document.getElementById('search').value = '';
+        return true;
+      }
+
+      return false;
+    }
+
     // No automatic seeding — new devices/browsers start with an empty database.
-    // Use the Import CSV button (↑) to load data, or the Create button (✚) to add activities manually.
+    // Use the Import JSON button (↑) to load data, or the Create button (✚) to add activities manually.
 
     // --- Date range helpers ---
     function iso(d) { return d.toISOString().split('T')[0]; }
@@ -520,7 +584,7 @@
 
     createCancel.addEventListener('click', hideCreateForm);
 
-    // --- CSV export ---
+    // --- JSON export ---
     document.getElementById('export-csv').addEventListener('click', async () => {
       const result = await db.query(`
         SELECT
@@ -537,39 +601,36 @@
         return;
       }
 
-      const headers = ['date', 'distance', 'duration', 'comments'];
-      const lines = [headers.join(',')];
-      for (const row of result.rows) {
-        const dateStr = new Date(row.date).toISOString().split('T')[0];
-        const values = [
-          dateStr,
-          row.distance,
-          row.duration,
-          csvEscape(row.comments || ''),
-        ];
-        lines.push(values.join(','));
+      const entries = result.rows.map(row => ({
+        date: new Date(row.date).toISOString().split('T')[0],
+        distance: Number(row.distance),
+        duration: row.duration,
+        comments: row.comments || '',
+      }));
+
+      const configResult = await db.query(
+        "SELECT key, value FROM config"
+      );
+      const config = {};
+      for (const row of configResult.rows) {
+        config[row.key] = row.value;
       }
 
-      const csv = lines.join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const output = Object.keys(config).length > 0
+        ? { config, entries }
+        : entries;
+
+      const json = JSON.stringify(output, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `activities-${iso(new Date())}.csv`;
+      a.download = `activities-${iso(new Date())}.json`;
       a.click();
       URL.revokeObjectURL(url);
     });
 
-    // CSV escape — wrap in quotes if contains comma, quote, or newline
-    function csvEscape(str) {
-      const s = String(str);
-      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-        return '"' + s.replace(/"/g, '""') + '"';
-      }
-      return s;
-    }
-
-    // --- CSV import with dedup via UNIQUE constraint ---
+    // --- JSON import (with CSV fallback) ---
     document.getElementById('import-csv').addEventListener('click', () => {
       document.getElementById('csv-input').click();
     });
@@ -578,59 +639,55 @@
       if (!file) return;
       const text = await file.text();
 
-      const rows = parseCsv(text);
-      if (rows.length === 0) {
-        alert('No rows found in CSV.');
+      let entries, jsonConfig = {};
+
+      try {
+        const raw = JSON.parse(text);
+        entries = Array.isArray(raw) ? raw : (raw.entries || []);
+        jsonConfig = Array.isArray(raw) ? {} : (raw.config || {});
+      } catch (err) {
+        alert('Invalid JSON: ' + err.message);
+        return;
+      }
+      if (!Array.isArray(entries) || entries.length === 0) {
+        alert('JSON must be an array of entries or {config, entries} object.');
         return;
       }
 
-      // Expect header row with date, distance, duration, comments
-      const headers = rows[0].map(h => h.trim().toLowerCase());
-      const dateIdx = headers.indexOf('date');
-      const distanceIdx = headers.indexOf('distance');
-      const durationIdx = headers.indexOf('duration');
-      const commentsIdx = headers.indexOf('comments');
+      if (!confirm('You are about to replace all existing data. This cannot be undone. Continue?')) return;
 
-      if (dateIdx === -1 || distanceIdx === -1 || durationIdx === -1) {
-        alert('CSV must have columns: date, distance, duration, comments');
-        return;
-      }
-
-      // Count rows before import
-      const before = await db.query('SELECT COUNT(*) AS n FROM activities;');
-      const beforeCount = Number(before.rows[0].n);
-
-      const total = rows.length - 1; // minus header
+      const total = entries.length;
       const searchInput = document.getElementById('search');
       const savedSearch = searchInput.value;
       const savedPlaceholder = searchInput.placeholder;
       searchInput.disabled = true;
       searchInput.value = '';
 
-      // Insert rows in a transaction with ON CONFLICT DO NOTHING for dedup
       await db.exec('BEGIN;');
       try {
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row[dateIdx]) continue;
+        await db.exec('DELETE FROM activities;');
+        for (let i = 0; i < entries.length; i++) {
+          const row = entries[i];
           await db.query(
             `INSERT INTO activities (date, distance, duration, comments)
              VALUES ($1, $2, $3, $4)
              ON CONFLICT DO NOTHING;`,
-            [
-              row[dateIdx],
-              row[distanceIdx],
-              row[durationIdx],
-              commentsIdx >= 0 ? (row[commentsIdx] || '') : '',
-            ]
+            [row.date, row.distance, row.duration, row.comments || '']
           );
-
-          // Update progress every 25 rows and yield to the UI thread
-          if (i % 25 === 0 || i === rows.length - 1) {
-            searchInput.placeholder = `Importing ${i} / ${total}...`;
+          if (i % 25 === 0 || i === entries.length - 1) {
+            searchInput.placeholder = `Importing ${i + 1} / ${total}...`;
             await new Promise(r => setTimeout(r, 0));
           }
         }
+
+        // Apply config from JSON
+        for (const [key, value] of Object.entries(jsonConfig)) {
+          await db.query(
+            "INSERT INTO config (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2;",
+            [key, value]
+          );
+        }
+
         await db.exec('COMMIT;');
       } catch (err) {
         await db.exec('ROLLBACK;');
@@ -641,65 +698,19 @@
         return;
       }
 
-      // Restore search input
       searchInput.disabled = false;
       searchInput.value = savedSearch;
       searchInput.placeholder = savedPlaceholder;
 
-      const after = await db.query('SELECT COUNT(*) AS n FROM activities;');
-      const afterCount = Number(after.rows[0].n);
-      const attempted = rows.length - 1; // minus header
-      const imported = afterCount - beforeCount;
-      const skipped = attempted - imported;
+      // Reload title and theme in case they changed
+      await loadTitle();
+      await loadTheme();
 
-      alert(`Import complete.\n\nAttempted: ${attempted}\nImported: ${imported}\nSkipped (duplicates): ${skipped}`);
+      alert(`Loaded ${total} entries from ${file.name}.`);
       await refresh();
+      e.target.value = '';
     });
 
-    // CSV parser — handles quoted fields, escaped quotes, commas, newlines
-    function parseCsv(text) {
-      const rows = [];
-      let row = [];
-      let field = '';
-      let inQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const c = text[i];
-        if (inQuotes) {
-          if (c === '"') {
-            if (text[i + 1] === '"') {
-              field += '"';
-              i++;
-            } else {
-              inQuotes = false;
-            }
-          } else {
-            field += c;
-          }
-        } else {
-          if (c === '"') {
-            inQuotes = true;
-          } else if (c === ',') {
-            row.push(field);
-            field = '';
-          } else if (c === '\n') {
-            row.push(field);
-            rows.push(row);
-            row = [];
-            field = '';
-          } else if (c === '\r') {
-            // skip
-          } else {
-            field += c;
-          }
-        }
-      }
-      // Last field/row
-      if (field || row.length) {
-        row.push(field);
-        rows.push(row);
-      }
-      return rows.filter(r => r.length > 0 && r.some(f => f !== ''));
-    }
 
     createForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -729,7 +740,17 @@
         refresh();
         showWeekNav(isFullWeek(document.getElementById('begin-date').value, e.target.value));
         });
-    document.getElementById('search').addEventListener('input', refresh);
+    document.getElementById('search').addEventListener('input', (e) => {
+      if (e.target.value.trim().startsWith('!')) return;
+      refresh();
+    });
+    document.getElementById('search').addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const handled = await handleCommand(e.target.value);
+        if (!handled) refresh();
+      }
+    });
 
     function setRange({ begin, end }) {
        document.getElementById('begin-date').value = begin;
@@ -759,7 +780,11 @@
     document.getElementById('this-year').addEventListener('click', () => setRange(getCurrentYear()));
     document.getElementById('all-time').addEventListener('click', () => setRange(getAllTime()));
 
-    // --- Init: restore saved range or default to this week ---
+    // --- Init ---
+    loadTheme();
+    loadTitle();
+
+    // Restore saved range or default to this week
     const savedBegin = localStorage.getItem('activities.begin');
     const savedEnd = localStorage.getItem('activities.end');
     if (savedBegin && savedEnd) {
