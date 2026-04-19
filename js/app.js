@@ -18,7 +18,7 @@ await db.exec(`
 `);
 
 // --- Theme from config ---
-const VALID_THEMES = ['green', 'amber', 'white'];
+const VALID_THEMES = ['green', 'amber', 'white', 'plain'];
 async function loadTheme() {
   const result = await db.query("SELECT value FROM config WHERE key = 'theme'");
   const theme = result.rows[0]?.value || 'green';
@@ -359,6 +359,23 @@ document.getElementById('output').addEventListener('click', async (e) => {
     await refresh();
     return;
   }
+});
+
+// --- Ctrl+Enter or Shift+Enter submits create form ---
+document.getElementById('create-form').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
+    e.preventDefault();
+    document.getElementById('create-form').requestSubmit();
+  }
+});
+
+// --- Ctrl+Enter or Shift+Enter saves inline edit ---
+document.getElementById('output').addEventListener('keydown', async (e) => {
+  if (e.key !== 'Enter' || (!e.ctrlKey && !e.shiftKey)) return;
+  const tr = e.target.closest('tr.editing');
+  if (!tr) return;
+  e.preventDefault();
+  tr.querySelector('.save').click();
 });
 
 // --- Esc key = cancel current edit/create ---
