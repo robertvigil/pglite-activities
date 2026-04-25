@@ -4,7 +4,7 @@ A minimalist activity tracker that runs **entirely in your browser**. No backend
 
 Built for logging distance-based exercises (biking, running, walking) but the schema adapts to anything with a date, a distance, a duration, and notes.
 
-**Live demo:** [robertvigil.com/activities](https://robertvigil.com/activities)
+**Live demo:** [robertvigil.com/activities](https://robertvigil.com/public/activities)
 
 <img src="screenshots/mobile.jpg" alt="Mobile screenshot" width="300">
 
