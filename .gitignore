@@ -10,6 +10,7 @@ deploy.sh
 # Generated audio/wav files, temp exports, downloads
 *.wav
 *.csv
+ROADMAP.md
 
 # Common
 .DS_Store

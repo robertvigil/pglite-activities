@@ -20,11 +20,12 @@ A single HTML file with separate CSS and JS modules loaded as ES modules. Activi
 - **Smart list/summary display** — ≤40 rows shows individual activities, >40 rows shows totals only (prevents wall-of-text for wide date ranges)
 - **Inline CRUD** — add, edit, delete activities with compact icon buttons (✚ ✎ ✕ ✓ ↺)
 - **JSON import/export** — round-trip activities to a JSON file. Import replaces all data (with confirmation). Settings (title, theme) are included in exports.
+- **Live-sync to a local JSON file** (Chromium browsers) — pick a file once with 🔗 (open existing) or 📝 (create new), and every edit auto-saves to disk. Pair with Syncthing/Dropbox for invisible multi-device backups. Falls back to manual ↓/↑ on Firefox/Safari.
 - **Configurable title** — type `!title My Rides` in the search bar to customize the `[activities]` header. Included in JSON exports.
-- **Theme support** — type `!theme amber`, `!theme white`, or `!theme green` in the search bar to switch the accent color. Persists across sessions and is included in JSON exports.
+- **Theme support** — type `!theme amber`, `!theme white`, `!theme green`, or `!theme plain` in the search bar to switch the accent color. Defaults to `plain` (light background, system font). Persists across sessions and is included in JSON exports.
 - **Keyboard-friendly** — Esc cancels create/edit, Enter submits forms
 - **Mobile responsive** — compact cards on small screens, tables on desktop
-- **Retro terminal aesthetic** — green-on-black by default, with amber and white alternatives
+- **Light or retro terminal aesthetic** — `plain` (light, default), or terminal themes (`green`, `amber`, `white`) on a dark background
 
 ## Architecture
 
@@ -107,7 +108,22 @@ It's one HTML file. Drop it behind any web server — nginx, Caddy, Vercel, GitH
 
 ## Import / Export
 
-**Export JSON** (↓ button): downloads `activities-YYYY-MM-DD.json` with all rows and settings. Format:
+The toolbar shows one of two button pairs depending on browser capability:
+
+### Chromium (Chrome / Edge / Arc / Opera) — `🔗` and `📝`
+
+- **🔗 Open** — pick an existing JSON file. The app reads it (optionally loading entries into the DB) and then **live-syncs every edit back to that file**. No manual save. Filename appears next to the icon.
+- **📝 Create** — pick a new path (default `activities.json`). The current DB is written to it immediately and live-sync starts. The OS warns you if you overwrite an existing file.
+- After attach, only `🔗` remains (with the filename). Click to detach. New browser session shows a one-click re-grant prompt.
+
+**Brave** ships this API disabled by default — enable `brave://flags/#file-system-access-api` to use it, or fall back to the manual flow below.
+
+### Firefox / Safari / non-secure HTTP — `↓` and `↑`
+
+- **`↓ Save`** — downloads `activities-YYYY-MM-DD.json` with all rows and settings.
+- **`↑ Open`** — replaces all existing data with the contents of a JSON file (with confirmation). Settings (title, theme) are applied from the JSON config.
+
+### JSON format (both flows)
 
 ```json
 {
@@ -118,17 +134,20 @@ It's one HTML file. Drop it behind any web server — nginx, Caddy, Vercel, GitH
 }
 ```
 
-**Import JSON** (↑ button): replaces all existing data with the contents of a JSON file (with confirmation prompt). Settings (title, theme) are applied from the JSON config.
-
 ## Syncing between devices
 
-There's no built-in sync. The recommended workflow is:
+If you're on Chromium, the easiest path is **🔗 attach to a JSON file in a synced folder** (Syncthing, Dropbox, iCloud Drive). Edits propagate invisibly:
+
+1. On device A, attach to `~/Sync/activities.json` and edit normally — every change writes to disk and syncs.
+2. On device B, attach to the same path. To pick up A's latest changes, detach + re-attach (sync is one-way: app → file).
+
+If FSA isn't available, the legacy round-trip still works:
 
 1. Export JSON on device A
-2. Move the JSON file to device B (Syncthing, email, USB, whatever)
+2. Move the JSON file to device B
 3. Import JSON on device B
 
-For automatic sync between a browser-based PGlite database and a real Postgres server, look into [ElectricSQL](https://electric-sql.com/) — same team that makes PGlite.
+For automatic two-way sync between a browser-based PGlite database and a real Postgres server, look into [ElectricSQL](https://electric-sql.com/) — same team that makes PGlite.
 
 ## Data privacy
 
