@@ -1,4 +1,4 @@
-import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js';
+import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.4.6/dist/index.js';
 import { setupCrud } from './crud.js';
 
 const db = new PGlite('idb://activities-v4');
