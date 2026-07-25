@@ -508,5 +508,5 @@ export function setupCrud(db, refreshFn, { loadTitle, loadTheme }) {
     })();
   }
 
-  return { syncToFile };
+  return { syncToFile, buildExportData, importJsonData };
 }

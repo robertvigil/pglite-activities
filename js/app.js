@@ -1,5 +1,6 @@
 import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.4.6/dist/index.js';
 import { setupCrud } from './crud.js';
+import { setupCloud } from './cloud.js';
 
 const db = new PGlite('idb://activities-v4');
 
@@ -40,6 +41,12 @@ async function handleCommand(input) {
 
   const parts = raw.substring(1).split(/\s+/);
   const cmd = parts[0]?.toLowerCase();
+
+  if (cmd === 'cloud' || cmd === 'push' || cmd === 'pull') {
+    const handled = await cloud.command(cmd, parts.slice(1));
+    if (handled) document.getElementById('search').value = '';
+    return handled;
+  }
 
   if (cmd === 'title') {
     const newTitle = parts.slice(1).join(' ');
@@ -275,10 +282,15 @@ async function refresh() {
     html += '</table>';
     div.innerHTML = html;
   }
+
+  cloud.updateDirty();
 }
 
 // --- Setup CRUD (create form, edit/delete, JSON open/save, FSA attach) ---
-const { syncToFile } = setupCrud(db, refresh, { loadTitle, loadTheme });
+const { syncToFile, buildExportData, importJsonData } = setupCrud(db, refresh, { loadTitle, loadTheme });
+
+// --- Setup cloud (encrypted remote snapshots via !cloud/!push/!pull) ---
+const cloud = setupCloud({ appKind: 'activities', buildExportData, importJsonData, refresh, syncToFile });
 
 // --- Wire up controls ---
 document.getElementById('begin-date').addEventListener('change', (e) => {

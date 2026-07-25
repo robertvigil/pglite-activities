@@ -149,6 +149,38 @@ If FSA isn't available, the legacy round-trip still works:
 
 For automatic two-way sync between a browser-based PGlite database and a real Postgres server, look into [ElectricSQL](https://electric-sql.com/) — same team that makes PGlite.
 
+## Cloud snapshots (encrypted, optional)
+
+Push and pull **encrypted** snapshots to [jsonbin.io](https://jsonbin.io) so you can move data between devices without a file in a synced folder. Everything is encrypted **in your browser** before upload — jsonbin only ever stores ciphertext.
+
+**One-time setup**
+
+1. Make a free jsonbin.io account, create a **Collection**, and copy its Collection ID.
+2. In the search bar, run `!cloud jsonbin <collectionId>`. You'll be prompted (masked) for your jsonbin **Master Key**.
+3. On your first `!push` you'll be prompted for an **encryption passphrase**. Use the *same* passphrase on every device — it's what the data is encrypted with.
+
+Both secrets are stored in this device's IndexedDB (set once, not re-typed each session). `!cloud off` forgets them.
+
+**Commands** (all in the search bar)
+
+| Command | What it does |
+|---|---|
+| `!cloud` | Show status: collection, device, what's stored, in-sync vs unsaved |
+| `!cloud jsonbin <collectionId>` | Configure the backend (prompts for master key) |
+| `!cloud list` | List your remote snapshots — no passphrase needed |
+| `!push [name]` | Encrypt + upload a snapshot (default name `main`) |
+| `!pull [name]` | Download + decrypt + load a snapshot (replaces local data) |
+| `!cloud device <label>` | Label this device (`laptop`, `phone`) so `list` is readable |
+| `!cloud off` | Disconnect and forget secrets on this device |
+
+Snapshots are **named** — keep a `main` plus, say, a `pre-import` backup, and pull any of them onto any device. A small `☁` indicator under the search bar shows when local changes haven't been pushed (click it to push).
+
+**Notes**
+
+- Encryption is WebCrypto **PBKDF2 (250k) → AES-GCM**; needs a secure context (https or localhost).
+- Each snapshot carries a cleartext `app` tag, so trying to `!pull` a *feed* backup into activities is refused before anything is decrypted.
+- jsonbin's free tier caps bin size — a very large export may need a self-hosted backend instead (planned: `RemoteStore` is an interface; a `robertvigil.com/vault` backend can slot in behind the same commands).
+
 ## Data privacy
 
 - Activity data lives **only** in your browser's IndexedDB
