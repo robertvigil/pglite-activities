@@ -316,10 +316,11 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
     else { ind.style.display = 'none'; }
   }
 
+  let busy = false; // true only while an op holds the spinner; the op clears it before settling
   let dirtyTimer = null;
   function updateDirty() { clearTimeout(dirtyTimer); dirtyTimer = setTimeout(_updateDirty, 300); }
   async function _updateDirty() {
-    if (ind && ind.dataset.state === 'busy') return; // don't clobber an in-flight op
+    if (busy) return; // a refresh()-driven tick fired mid-op — don't clobber the spinner
     if (!loadConfig()) { setInd(); return; }
     let data;
     try { data = await buildExportData(); } catch { return; }
@@ -415,7 +416,7 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
     if (!secureOk()) return;
     const masterKey = await ensureMasterKey();
     if (!masterKey) return;
-    setInd('busy');
+    busy = true; setInd('busy');
     try {
       const arr = await listSnapshots(masterKey, cfg.collectionId);
       if (!arr.length) alert(`No ${appKind} snapshots in this collection yet.\n\nCreate one with:  !push`);
@@ -425,7 +426,7 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
         `\n\nPull one with:  !pull <name>`
       );
     } catch (e) { alert('List failed: ' + e.message); }
-    finally { updateDirty(); }
+    finally { busy = false; updateDirty(); }
   }
 
   async function doPush(name) {
@@ -436,7 +437,7 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
     if (!masterKey) return;
     const passphrase = await ensurePassphrase();
     if (!passphrase) return;
-    setInd('busy');
+    busy = true; setInd('busy');
     try {
       const data = await buildExportData();
       const count = Array.isArray(data) ? data.length : (data.entries ? data.entries.length : 0);
@@ -459,7 +460,7 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
       alert(`Pushed "${name}" — ${count} entries.`);
     } catch (e) {
       alert('Push failed: ' + e.message + describeNetworkError(e));
-    } finally { updateDirty(); }
+    } finally { busy = false; updateDirty(); }
   }
 
   async function doPull(name) {
@@ -468,7 +469,7 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
     if (!secureOk()) return;
     const masterKey = await ensureMasterKey();
     if (!masterKey) return;
-    setInd('busy');
+    busy = true; setInd('busy');
     try {
       const found = await resolveBin(masterKey, cfg.collectionId, name);
       if (!found) { alert(`No snapshot named "${name}" for ${appKind}.\n\nSee what's there:  !cloud list`); updateDirty(); return; }
@@ -488,7 +489,7 @@ export function setupCloud({ appKind, buildExportData, importJsonData, refresh, 
       }
     } catch (e) {
       alert('Pull failed: ' + e.message + describeNetworkError(e));
-    } finally { updateDirty(); }
+    } finally { busy = false; updateDirty(); }
   }
 
   async function doOff() {
