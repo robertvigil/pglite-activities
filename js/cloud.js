@@ -70,14 +70,31 @@ async function deriveKey(passphrase, salt, iter) {
     ['encrypt', 'decrypt']
   );
 }
+// --- gzip the PLAINTEXT before encrypting (ciphertext is incompressible, so the
+//     order matters). Markdown/JSON compresses ~3-5x, which is what keeps the
+//     base64 envelope under jsonbin's per-bin size limit. jsonbin never sees any
+//     of this — gzip lives inside the encrypted `ct` string. ---
+const canGzip = typeof CompressionStream !== 'undefined' && typeof DecompressionStream !== 'undefined';
+async function gzip(u8) {
+  const stream = new Blob([u8]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+async function gunzip(u8) {
+  const stream = new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
 async function encryptEnvelope(obj, passphrase, meta) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const iter = 250000;
   const key = await deriveKey(passphrase, salt, iter);
-  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj)));
+  let bytes = enc.encode(JSON.stringify(obj));
+  let zip = 'none';
+  if (canGzip) { bytes = await gzip(bytes); zip = 'gzip'; }
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, bytes);
   return {
-    v: 1, app: meta.app, name: meta.name, cipher: 'AES-GCM',
+    v: 1, app: meta.app, name: meta.name, cipher: 'AES-GCM', zip,
     kdf: { name: 'PBKDF2', hash: 'SHA-256', iter, salt: toB64(salt) },
     iv: toB64(iv), ct: toB64(ct),
     savedAt: meta.savedAt, device: meta.device,
@@ -86,7 +103,9 @@ async function encryptEnvelope(obj, passphrase, meta) {
 async function decryptEnvelope(env, passphrase) {
   const key = await deriveKey(passphrase, fromB64(env.kdf.salt), env.kdf.iter);
   const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(env.iv) }, key, fromB64(env.ct));
-  return JSON.parse(dec.decode(pt));
+  let bytes = new Uint8Array(pt);
+  if (env.zip === 'gzip') bytes = await gunzip(bytes); // undefined/'none' = uncompressed (back-compat)
+  return JSON.parse(dec.decode(bytes));
 }
 
 // --- tiny IndexedDB key/value store for the two device-persisted secrets ---

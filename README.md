@@ -177,9 +177,9 @@ Snapshots are **named** — keep a `main` plus, say, a `pre-import` backup, and 
 
 **Notes**
 
-- Encryption is WebCrypto **PBKDF2 (250k) → AES-GCM**; needs a secure context (https or localhost).
+- Data is **gzip-compressed then encrypted** (WebCrypto **PBKDF2 (250k) → AES-GCM**), so the uploaded blob is small; needs a secure context (https or localhost). What's stored remotely is always a JSON envelope with a base64 `ct` field — jsonbin never sees gzip or your data.
 - Each snapshot carries a cleartext `app` tag, so trying to `!pull` a *feed* backup into activities is refused before anything is decrypted.
-- jsonbin's free tier caps bin size — a very large export may need a self-hosted backend instead (planned: `RemoteStore` is an interface; a `robertvigil.com/vault` backend can slot in behind the same commands).
+- jsonbin's free tier caps bin size at 100 KB (Pro: 1 MB). Compression usually keeps you well under the free limit; a very large export may still need a self-hosted backend (planned: `RemoteStore` is an interface; a `robertvigil.com/vault` backend can slot in behind the same commands).
 
 ## Data privacy
 
