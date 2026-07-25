@@ -1,0 +1,253 @@
+* { box-sizing: border-box; }
+:root { --accent: #0f0; --accent-dim: #1a2a1a; }
+:root[data-theme="green"] { --accent: #0f0; --accent-dim: #1a2a1a; }
+:root[data-theme="amber"] { --accent: #ffb000; --accent-dim: #2a2210; }
+:root[data-theme="white"] { --accent: #e0e0e0; --accent-dim: #1a1a1a; }
+:root[data-theme="plain"] { --accent: #333; --accent-dim: #f0f0f0; }
+:root[data-theme="noir"] { --accent: #38e1ff; --accent-2: #8f8bd8; --accent-dim: rgba(56,225,255,.10); }
+body {
+  font-family: 'Courier New', monospace;
+  background: #111; color: var(--accent);
+  max-width: 900px; margin: 0 auto; padding: 8px 20px;
+}
+/* Plain theme — light background overrides */
+[data-theme="plain"] body { background: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+[data-theme="plain"] .search-bar input,
+[data-theme="plain"] .create-form input,
+[data-theme="plain"] .create-form textarea { background: #fff; border-color: #ccc; }
+[data-theme="plain"] table { background: #fff; }
+[data-theme="plain"] tr:hover { background: #f5f5f5; }
+[data-theme="plain"] th { background: #f0f0f0; }
+[data-theme="plain"] th, [data-theme="plain"] td { border-color: #ddd; }
+[data-theme="plain"] .controls input[type="date"] { background: #fff; border-color: #ccc; }
+[data-theme="plain"] .controls button,
+[data-theme="plain"] .controls .help-link { background: #f5f5f5; border-color: #ccc; }
+[data-theme="plain"] .create-form { background: #fafafa; border-color: #ddd; }
+[data-theme="plain"] tr.editing td input,
+[data-theme="plain"] tr.editing td textarea { background: #fff; border-color: #ccc; }
+h1 { color: var(--accent); margin: 0 0 8px; font-size: 1.2em; }
+p { color: #888; font-size: 0.85em; margin-bottom: 15px; }
+
+/* ==========================================================================
+   Noir theme — dark slate + cyan/violet, to match robertvigil.com's theme.
+   Structured like the "plain" overrides: grey body text with cyan accents,
+   rather than the monochrome terminal look of green/amber.
+   ========================================================================== */
+[data-theme="noir"] body {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(56,225,255,.10), transparent 22rem),
+    radial-gradient(circle at 100% 0%, rgba(143,139,216,.12), transparent 20rem),
+    #1b1f2a;
+  background-attachment: fixed;
+  color: #c7cdda;
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  padding-top: 28px;
+}
+[data-theme="noir"] h1 { text-shadow: 0 0 24px rgba(56,225,255,.25); }
+[data-theme="noir"] .controls label,
+[data-theme="noir"] .attach-name,
+[data-theme="noir"] .totals .label { color: #8b93a6; }
+
+[data-theme="noir"] .controls input[type="date"],
+[data-theme="noir"] .search-bar input,
+[data-theme="noir"] .create-form input,
+[data-theme="noir"] .create-form textarea,
+[data-theme="noir"] tr.editing td input,
+[data-theme="noir"] tr.editing td textarea {
+  background: #232838; color: #eaedf4;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
+}
+[data-theme="noir"] .controls input[type="date"]:focus,
+[data-theme="noir"] .search-bar input:focus,
+[data-theme="noir"] .create-form input:focus,
+[data-theme="noir"] .create-form textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56,225,255,.14);
+}
+[data-theme="noir"] .search-bar input::placeholder,
+[data-theme="noir"] .create-form input::placeholder { color: #6b7385; }
+
+[data-theme="noir"] .controls button,
+[data-theme="noir"] .controls .help-link {
+  background: rgba(255,255,255,.04); color: #c7cdda;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
+}
+[data-theme="noir"] .controls button:hover,
+[data-theme="noir"] .controls .help-link:hover {
+  color: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56,225,255,.12);
+}
+
+[data-theme="noir"] table {
+  background: rgba(255,255,255,.02); border-radius: 10px; overflow: hidden;
+}
+[data-theme="noir"] th, [data-theme="noir"] td { border-color: rgba(255,255,255,.08); }
+[data-theme="noir"] th { background: #232838; color: var(--accent); }
+[data-theme="noir"] tr:hover { background: rgba(56,225,255,.05); }
+
+[data-theme="noir"] .totals { border-radius: 12px; }
+[data-theme="noir"] .create-form {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 12px;
+}
+[data-theme="noir"] #status { color: #6b7385; }
+[data-theme="noir"] .create-bar button,
+[data-theme="noir"] td.actions button { color: #7a8296; }
+
+@media (max-width: 600px) {
+  [data-theme="noir"] tr { border-color: rgba(255,255,255,.1); border-radius: 8px; }
+}
+
+/* Date range controls */
+.controls {
+  display: flex; gap: 10px; align-items: center;
+  margin-bottom: 15px; flex-wrap: wrap;
+}
+.controls label { color: #888; font-size: 0.85em; }
+.controls input[type="date"] {
+  padding: 6px 8px; font-size: 14px;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 3px; font-family: inherit;
+}
+.controls button,
+.controls .help-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 30px; padding: 0 8px;
+  background: #222; color: var(--accent); border: 1px solid #555;
+  border-radius: 3px; cursor: pointer; font-family: inherit;
+  font-size: 13px; text-decoration: none;
+}
+.controls button:hover,
+.controls .help-link:hover { border-color: var(--accent); }
+
+/* Search bar */
+.search-bar { margin-bottom: 10px; }
+.search-bar input {
+  width: 100%; padding: 7px 10px; font-size: 14px;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 3px; font-family: inherit;
+}
+.search-bar input::placeholder { color: #555; }
+
+/* Results table */
+table {
+  width: 100%; border-collapse: collapse;
+  background: #1a1a1a; font-size: 0.9em;
+}
+th, td {
+  border: 1px solid #333; padding: 5px 10px; text-align: left;
+}
+th { background: #222; color: var(--accent); }
+tr:hover { background: #222; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Totals panel */
+.totals {
+  margin-top: 15px; padding: 10px 8px;
+  background: var(--accent-dim); border: 1px solid var(--accent);
+  border-radius: 4px; display: flex; gap: 15px;
+  font-size: 0.95em;
+}
+.totals .item { display: flex; gap: 4px; }
+.totals .label { color: #888; }
+.totals .value { color: var(--accent); font-weight: bold; }
+
+#status { color: #666; font-size: 0.8em; margin-top: 10px; }
+
+/* Create form */
+.create-bar {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 10px;
+}
+.create-bar button {
+  padding: 2px 8px; font-size: 22px;
+  background: transparent; color: #666; border: none;
+  cursor: pointer; font-family: inherit; line-height: 1;
+}
+.create-bar button:hover { color: var(--accent); }
+.attach-name {
+  color: #888; font-size: 0.85em; margin-left: 2px;
+  font-family: inherit;
+}
+.attach-name.granted { color: var(--accent); }
+.attach-name.needs-permission { color: #ffb000; cursor: pointer; }
+.attach-name.needs-permission::after { content: ' ⚠'; }
+.create-form {
+  display: none; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 15px; padding: 10px;
+  background: #1a1a1a; border: 1px solid #333; border-radius: 4px;
+}
+.create-form.open { display: flex; }
+.create-form input, .create-form textarea {
+  padding: 6px 8px; font-size: 14px;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 3px; font-family: inherit;
+}
+.create-form input[type="date"] { width: 150px; }
+.create-form input[type="number"] { width: 90px; }
+.create-form input#new-duration { width: 100px; }
+
+/* Hide number input spinners (Chrome/Safari and Firefox) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+   -webkit-appearance: none; margin: 0;
+}
+input[type="number"] {
+   -moz-appearance: textfield;
+}
+.create-form input#new-comments { flex: 1; min-width: 200px; }
+.create-form .actions { display: flex; gap: 2px; }
+.create-form button {
+  padding: 2px 8px; font-size: 22px;
+  background: transparent; color: #666; border: none;
+  cursor: pointer; font-family: inherit; line-height: 1;
+}
+.create-form button[type="submit"]:hover { color: var(--accent); }
+.create-form button.cancel:hover { color: #f66; }
+
+/* Row action buttons */
+td.actions {
+  white-space: nowrap; text-align: right; width: 1px;
+}
+td.actions button {
+  padding: 2px 6px; font-size: 18px; margin-left: 2px;
+  background: transparent; color: #666; border: none;
+  cursor: pointer; font-family: inherit; line-height: 1;
+}
+td.actions button:hover { color: var(--accent); }
+td.actions button.delete:hover { color: #f66; }
+td.actions button.save { color: var(--accent); font-weight: bold; }
+td.actions button.cancel:hover { color: #f66; }
+
+/* Inline edit inputs */
+tr.editing td input, tr.editing td textarea {
+  width: 100%; padding: 3px 5px; font-size: 0.85em;
+  background: #222; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 2px; font-family: inherit;
+}
+tr.editing td input[type="date"] { width: auto; }
+
+/* Mobile: stack each row as a block so comments can wrap below */
+@media (max-width: 600px) {
+  body { padding-bottom: 30px; }
+  table, tbody, tr, td { display: block; width: 100%; }
+   /* Hide the header row (which uses plain th cells, no thead wrapper) */
+  table tr:first-child th { display: none; }
+  table tr:has(th) { display: none; }
+  tr {
+    border: 1px solid #333; border-radius: 4px;
+    padding: 6px 8px; margin-bottom: 6px; position: relative;
+   }
+  td { border: none; padding: 1px 0; }
+  td:nth-child(1)::before { content: ''; } /* date: first line */
+  td:nth-child(2) { display: inline-block; width: auto; padding-right: 10px; }
+  td:nth-child(3) { display: inline-block; width: auto; }
+  td:nth-child(4) { color: #888; font-size: 0.9em; display: inline; }
+  td.actions {
+    display: inline; padding-left: 10px;
+   }
+   /* Compact date + distance + duration on one visual line via inline-block */
+  td:nth-child(1) {
+    display: inline-block; width: auto; padding-right: 10px;
+   }
+}

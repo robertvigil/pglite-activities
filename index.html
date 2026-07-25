@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html data-theme="noir">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Activities</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1 id="home-link" style="cursor:pointer">[activities]</h1>
+
+    <div class="controls">
+        <input type="date" id="begin-date">
+        <label>→</label>
+            <input type="date" id="end-date">
+            <div id="week-nav-buttons">
+            <button class="week-nav" id="prev-week" title="Previous week">◀</button>
+                <button class="week-nav" id="next-week" title="Next week">▶</button>
+            </div>
+            <div id="month-nav-buttons" style="display:none">
+            <button class="month-nav" id="prev-month" title="Previous month">◀</button>
+                <button class="month-nav" id="next-month" title="Next month">▶</button>
+            </div>
+        <button id="this-week">Wk</button>
+        <button id="this-month">Mo</button>
+        <button id="this-year">Yr</button>
+        <button id="all-time" title="All time">∞</button>
+        <a href="https://github.com/robertvigil/pglite-activities" target="_blank" rel="noopener" title="Help / docs" class="help-link">?</a>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="search" placeholder='Search comments — "rainy yale" (AND), "-trail" (exclude)' autocomplete="off">
+    </div>
+
+    <div class="create-bar">
+        <button id="create-toggle" title="New activity">✚</button>
+        <button id="export-csv" title="Export JSON">↓</button>
+        <button id="import-csv" title="Import JSON">↑</button>
+        <button id="attach-file" title="Open an existing JSON file and attach (live-sync)" style="display:none">🔗</button>
+        <button id="create-file" title="Create a new JSON file (or overwrite the one you pick) and attach" style="display:none">📝</button>
+        <span id="attach-name" class="attach-name"></span>
+        <input type="file" id="csv-input" style="display:none">
+    </div>
+    <form class="create-form" id="create-form">
+        <input type="date" id="new-date" required>
+        <input type="number" id="new-distance" step="0.01" min="0" placeholder="distance" required>
+        <input type="text" id="new-duration" placeholder="HH:MM:SS" pattern="^[0-9]{2}:[0-5][0-9]:[0-5][0-9]$" required>
+        <input type="text" id="new-comments" placeholder="comments (optional)">
+            <div class="actions">
+                <button type="submit" title="Save">✓</button>
+                <button type="button" class="cancel" id="create-cancel" title="Cancel">↺</button>
+            </div>
+    </form>
+
+    <div id="output">Loading PGlite...</div>
+    <div id="totals" class="totals" style="display:none"></div>
+    <div id="status"></div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
