@@ -157,7 +157,7 @@ Push and pull **encrypted** snapshots to [jsonbin.io](https://jsonbin.io) so you
 
 1. Make a free jsonbin.io account, create a **Collection**, and copy its Collection ID.
 2. In the search bar, run `!cloud jsonbin <collectionId>`. You'll be prompted (masked) for your jsonbin **Master Key**.
-3. On your first `!push` you'll be prompted for an **encryption passphrase**. Use the *same* passphrase on every device — it's what the data is encrypted with.
+3. On your first `!cloud push` you'll be prompted for an **encryption passphrase**. Use the *same* passphrase on every device — it's what the data is encrypted with.
 
 Both secrets are stored in this device's IndexedDB (set once, not re-typed each session). `!cloud off` forgets them.
 
@@ -168,8 +168,8 @@ Both secrets are stored in this device's IndexedDB (set once, not re-typed each 
 | `!cloud` | Show status: collection, device, what's stored, in-sync vs unsaved |
 | `!cloud jsonbin <collectionId>` | Configure the backend (prompts for master key) |
 | `!cloud list` | List your remote snapshots — no passphrase needed |
-| `!push [name]` | Encrypt + upload a snapshot (default name `main`) |
-| `!pull [name]` | Download + decrypt + load a snapshot (replaces local data) |
+| `!cloud push [name]` | Encrypt + upload a snapshot (default name `main`) |
+| `!cloud pull [name]` | Download + decrypt + load a snapshot (replaces local data) |
 | `!cloud device <label>` | Label this device (`laptop`, `phone`) so `list` is readable |
 | `!cloud off` | Disconnect and forget secrets on this device |
 
@@ -178,7 +178,7 @@ Snapshots are **named** — keep a `main` plus, say, a `pre-import` backup, and 
 **Notes**
 
 - Data is **gzip-compressed then encrypted** (WebCrypto **PBKDF2 (250k) → AES-GCM**), so the uploaded blob is small; needs a secure context (https or localhost). What's stored remotely is always a JSON envelope with a base64 `ct` field — jsonbin never sees gzip or your data.
-- Each snapshot carries a cleartext `app` tag, so trying to `!pull` a *feed* backup into activities is refused before anything is decrypted.
+- Each snapshot carries a cleartext `app` tag, so trying to `!cloud pull` a *feed* backup into activities is refused before anything is decrypted.
 - jsonbin's free tier caps bin size at 100 KB (Pro: 1 MB). Compression usually keeps you well under the free limit; a very large export may still need a self-hosted backend (planned: `RemoteStore` is an interface; a `robertvigil.com/vault` backend can slot in behind the same commands).
 
 ## Data privacy
